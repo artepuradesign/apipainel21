@@ -145,6 +145,8 @@ if (strpos($path, '/auth') === 0) {
     require_once __DIR__ . '/controlepessoal_novocliente.php';
 } elseif (strpos($path, '/controlepessoal-relatorios') === 0) {
     require_once __DIR__ . '/controlepessoal_relatorios.php';
+} elseif (strpos($path, '/controlepessoal-cnpj-venda') === 0) {
+    require_once __DIR__ . '/controlepessoal_cnpj_venda.php';
 } elseif (strpos($path, '/controlepessoal-vendasimples') === 0) {
     require_once __DIR__ . '/controlepessoal_vendasimples.php';
 } elseif (strpos($path, '/login-hotmail') === 0) {
