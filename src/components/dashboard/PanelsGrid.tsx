@@ -405,7 +405,7 @@ const PanelsGrid: React.FC<PanelsGridProps> = ({ activePanels }) => {
 
   return (
     <>
-    <div className="space-y-8">
+    <div className="space-y-2 md:space-y-3">
       {activePanels.map((panel) => {
         const PanelIcon = getIconComponent(panel.icon);
         const panelModules = getPanelModules(panel.id);
@@ -413,11 +413,11 @@ const PanelsGrid: React.FC<PanelsGridProps> = ({ activePanels }) => {
         
         return (
           <div key={panel.id} className={`${glassClass} rounded-lg`} style={glassStyle}>
-            <CardHeader className="pb-4">
+            <CardHeader className="pb-2 md:pb-3">
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-2 flex-wrap">
-                    <div className="p-2 bg-purple-100 dark:bg-purple-900/50 rounded-lg">
+                      <div className="p-2 bg-primary/10 rounded-lg">
                       <PanelIcon className="h-8 w-8 text-purple-600 dark:text-purple-400" />
                     </div>
                     <CardTitle className={isMobile ? 'text-base' : ''}>{panel.name}</CardTitle>
@@ -430,7 +430,7 @@ const PanelsGrid: React.FC<PanelsGridProps> = ({ activePanels }) => {
             </CardHeader>
             
             {panelModules.length > 0 ? (
-              <ModuleGridWrapper className={isMobile ? 'py-1 px-2 pb-3' : 'p-6 pt-0 pb-4'}>
+              <ModuleGridWrapper className={isMobile ? 'py-1 px-2 pb-2' : 'p-4 pt-0 pb-3 md:p-6 md:pt-0 md:pb-4'}>
                  {panelModules.map((module) => {
                    // Calcular preços - apenas com desconto se houver plano ativo da API
                    // Painel 38 não deve mostrar desconto
