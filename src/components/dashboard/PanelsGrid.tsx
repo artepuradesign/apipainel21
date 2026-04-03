@@ -416,7 +416,7 @@ const PanelsGrid: React.FC<PanelsGridProps> = ({ activePanels }) => {
         const isCollapsed = collapsedPanels[panel.id] ?? false;
 
         return (
-          <div key={panel.id} className="space-y-2 md:space-y-3">
+          <div key={panel.id}>
             <PanelTitleBar
               title={panel.name}
               icon={<PanelIcon className="h-5 w-5 text-primary" />}
@@ -429,10 +429,10 @@ const PanelsGrid: React.FC<PanelsGridProps> = ({ activePanels }) => {
               onToggle={() => setCollapsedPanels((prev) => ({ ...prev, [panel.id]: !(prev[panel.id] ?? false) }))}
             />
 
-            <div className={`overflow-hidden transition-all duration-300 ease-out ${isCollapsed ? 'max-h-0 opacity-0 -translate-y-1 pointer-events-none' : 'max-h-[3000px] opacity-100 translate-y-0'}`}>
+            <div className={`overflow-hidden transition-all duration-300 ease-out ${isCollapsed ? 'max-h-0 opacity-0 -translate-y-1 pointer-events-none mt-0' : 'max-h-[3000px] opacity-100 translate-y-0 mt-2 md:mt-3'}`}>
               <div className={`${glassClass} rounded-lg`} style={glassStyle}>
                 {panelModules.length > 0 ? (
-                  <ModuleGridWrapper className={isMobile ? 'py-1 px-2 pb-2' : 'px-3 pt-2 pb-3 md:px-4 md:pt-2 md:pb-4'}>
+                  <ModuleGridWrapper className={isMobile ? 'px-3 pt-2 pb-2' : 'px-3 pt-2 pb-3 md:px-4 md:pt-2 md:pb-4'}>
                  {panelModules.map((module) => {
                    // Calcular preços - apenas com desconto se houver plano ativo da API
                    // Painel 38 não deve mostrar desconto
