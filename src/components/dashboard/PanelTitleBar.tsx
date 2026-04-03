@@ -65,7 +65,15 @@ const PanelTitleBar: React.FC<PanelTitleBarProps> = ({
                   <CircleHelp className="h-4 w-4" />
                 </Button>
                 {isHelpBalloonOpen ? (
-                  <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 rounded-md border border-border bg-popover px-3 py-2 text-xs text-popover-foreground shadow-md z-20 max-w-64 text-left whitespace-normal">
+                  <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 z-20 w-[260px] max-w-[80vw] rounded-md border border-border bg-popover px-4 py-3 text-left text-sm text-popover-foreground shadow-md whitespace-normal">
+                    <button
+                      type="button"
+                      className="absolute -top-2 -right-2 inline-flex h-6 w-6 items-center justify-center rounded-full border border-border bg-background text-foreground hover:bg-accent"
+                      aria-label="Fechar ajuda"
+                      onClick={() => setIsHelpBalloonOpen(false)}
+                    >
+                      ×
+                    </button>
                     {description}
                   </div>
                 ) : null}
