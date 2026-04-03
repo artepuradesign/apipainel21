@@ -98,6 +98,7 @@ const FaceIdSimiliridade = () => {
   const [detailResult, setDetailResult] = useState<SimilarityResult | null>(null);
   const [detailLandmarks, setDetailLandmarks] = useState<FaceLandmark[] | null>(null);
   const [loadingDetailId, setLoadingDetailId] = useState<number | null>(null);
+  const [detailAnimationRunId, setDetailAnimationRunId] = useState(0);
   const [genderFilter, setGenderFilter] = useState<'male' | 'female'>('male');
   const [apiResponse, setApiResponse] = useState<Record<string, unknown> | null>(null);
   const [guidelinesCollapsed, setGuidelinesCollapsed] = useState(false);
@@ -218,9 +219,16 @@ const FaceIdSimiliridade = () => {
   };
 
   const handleOpenDetail = async (item: SimilarityResult) => {
+    closeDetailModal();
+    setDetailResult(null);
+    setDetailLandmarks(null);
+
     if (!item.photo_url) {
-      setDetailLandmarks(null);
       setDetailResult(item);
+      setDetailAnimationRunId((prev) => prev + 1);
+      requestAnimationFrame(() => {
+        void startDetailProcessing(10000);
+      });
       return;
     }
 
@@ -233,7 +241,10 @@ const FaceIdSimiliridade = () => {
     } finally {
       setLoadingDetailId(null);
       setDetailResult(item);
-      void startDetailProcessing(10000);
+      setDetailAnimationRunId((prev) => prev + 1);
+      requestAnimationFrame(() => {
+        void startDetailProcessing(10000);
+      });
     }
   };
 
@@ -498,6 +509,7 @@ const FaceIdSimiliridade = () => {
       />
 
       <FaceProcessingAdvancedModal
+        key={`detail-${detailAnimationRunId}-${detailResult?.id ?? 'none'}`}
         open={detailModalOpen}
         imageSrc={detailResult?.photo_url || null}
         progress={detailProgress}
