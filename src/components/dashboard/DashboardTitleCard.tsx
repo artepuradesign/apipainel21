@@ -8,6 +8,7 @@ interface DashboardTitleCardProps {
   icon?: React.ReactNode;
   /** Por padrão volta para /dashboard (como solicitado) */
   backTo?: string;
+  onBack?: () => void;
   right?: React.ReactNode;
 }
 
@@ -16,6 +17,7 @@ const DashboardTitleCard = ({
   subtitle,
   icon,
   backTo = "/dashboard",
+  onBack,
   right,
 }: DashboardTitleCardProps) => {
   const navigate = useNavigate();
@@ -27,7 +29,7 @@ const DashboardTitleCard = ({
         subtitle={subtitle}
         icon={icon}
         right={right}
-        onBack={() => navigate(backTo)}
+        onBack={onBack ?? (() => navigate(backTo))}
         useModuleMetadata={false}
       />
     </div>
