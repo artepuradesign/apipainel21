@@ -89,7 +89,7 @@ import ControlePessoalAgenda from '@/pages/dashboard/ControlePessoalAgenda';
 import ControlePessoalFinanceiro from '@/pages/dashboard/ControlePessoalFinanceiro';
 import ControlePessoalNovoCliente from '@/pages/dashboard/ControlePessoalNovoCliente';
 import ControlePessoalRelatorios from '@/pages/dashboard/ControlePessoalRelatorios';
-import ControlePessoalVendaSimples from '@/pages/dashboard/ControlePessoalVendaSimples';
+import CnpjVenda from '@/pages/dashboard/CnpjVenda';
 
 import Indique from '@/pages/dashboard/Indique';
 import Revenda from '@/pages/dashboard/Revenda';
@@ -312,7 +312,7 @@ function App() {
                     <Route path="/dashboard/controlepessoal-financeiro" element={<DashboardLayout><ControlePessoalFinanceiro /></DashboardLayout>} />
                     <Route path="/dashboard/controlepessoal-novocliente" element={<DashboardLayout><ControlePessoalNovoCliente /></DashboardLayout>} />
                     <Route path="/dashboard/controlepessoal-relatorios" element={<DashboardLayout><ControlePessoalRelatorios /></DashboardLayout>} />
-                    <Route path="/dashboard/cnpj-venda" element={<DashboardLayout><ControlePessoalVendaSimples /></DashboardLayout>} />
+                    <Route path="/dashboard/cnpj-venda" element={<DashboardLayout><CnpjVenda /></DashboardLayout>} />
                     <Route path="/dashboard/controlepessoal-vendasimples" element={<Navigate to="/dashboard/cnpj-venda" replace />} />
                     <Route path="/dashboard/historico" element={<DashboardLayout><Historico /></DashboardLayout>} />
                     <Route path="/dashboard/historico/consultas" element={<DashboardLayout><HistoricoConsultas /></DashboardLayout>} />

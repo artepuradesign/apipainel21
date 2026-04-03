@@ -1,7 +1,7 @@
 import React from 'react';
 import ControlePessoalModulePage from '@/components/dashboard/controle-pessoal/ControlePessoalModulePage';
 
-const ControlePessoalVendaSimples = () => {
+const CnpjVenda = () => {
   return (
     <ControlePessoalModulePage
       moduleType="vendasimples"
@@ -12,4 +12,4 @@ const ControlePessoalVendaSimples = () => {
   );
 };
 
-export default ControlePessoalVendaSimples;
+export default CnpjVenda;
