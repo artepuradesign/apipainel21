@@ -221,10 +221,10 @@ const UserWalletDropdown = ({ onLogout }: UserWalletDropdownProps) => {
                       </button>
                     </div>
                     <Button
-                      variant="ghost"
-                      size="sm"
+                      variant="outline"
+                      size="icon"
                       onClick={() => setIsOpen(false)}
-                      className="absolute top-0 right-0 h-8 w-8 p-0 hover:bg-muted"
+                      className="absolute -top-2 -right-2 z-20 h-8 w-8 rounded-full border border-border bg-background text-foreground shadow-sm transition-colors hover:bg-foreground hover:text-background"
                     >
                       <X className="h-4 w-4" />
                     </Button>
