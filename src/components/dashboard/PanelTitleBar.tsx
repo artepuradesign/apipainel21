@@ -2,7 +2,6 @@ import React from 'react';
 import { Card, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ChevronDown, ChevronUp, CircleHelp, Plus, X } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
 
 interface PanelTitleBarProps {
   title: string;
@@ -31,7 +30,6 @@ const PanelTitleBar: React.FC<PanelTitleBarProps> = ({
   onAdd,
   onToggle,
 }) => {
-  const navigate = useNavigate();
   const [isHelpBalloonOpen, setIsHelpBalloonOpen] = React.useState(false);
   const [typedDescription, setTypedDescription] = React.useState('');
   const [isMobileViewport, setIsMobileViewport] = React.useState(() => (typeof window !== 'undefined' ? window.innerWidth < 640 : false));
