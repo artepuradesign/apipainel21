@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect, useMemo, useRef } from 'react';
+import { Reorder } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -87,6 +88,45 @@ const PanelsGrid: React.FC<PanelsGridProps> = ({ activePanels }) => {
   const [showFloatingPix, setShowFloatingPix] = useState(false);
   const [notificationToastId, setNotificationToastId] = useState<string | number | null>(null);
   const [collapsedPanels, setCollapsedPanels] = useState<Record<number, boolean>>({});
+  const [orderedPanels, setOrderedPanels] = useState<Panel[]>(activePanels);
+  const [isManualReorderEnabled, setIsManualReorderEnabled] = useState(false);
+  const iconHoldTimerRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    setOrderedPanels((prev) => {
+      if (!prev.length) return activePanels;
+
+      const incomingById = new Map(activePanels.map((panel) => [panel.id, panel]));
+      const kept = prev
+        .map((panel) => incomingById.get(panel.id))
+        .filter((panel): panel is Panel => Boolean(panel));
+      const keptIds = new Set(kept.map((panel) => panel.id));
+      const appended = activePanels.filter((panel) => !keptIds.has(panel.id));
+
+      return [...kept, ...appended];
+    });
+  }, [activePanels]);
+
+  const handleIconHoldStart = () => {
+    if (iconHoldTimerRef.current !== null) {
+      window.clearTimeout(iconHoldTimerRef.current);
+    }
+
+    iconHoldTimerRef.current = window.setTimeout(() => {
+      setIsManualReorderEnabled((prev) => {
+        const next = !prev;
+        toast.success(next ? 'Ordenação manual ativada' : 'Ordenação manual desativada');
+        return next;
+      });
+    }, 1000);
+  };
+
+  const handleIconHoldEnd = () => {
+    if (iconHoldTimerRef.current !== null) {
+      window.clearTimeout(iconHoldTimerRef.current);
+      iconHoldTimerRef.current = null;
+    }
+  };
   
   // Obter plano atual (subscription > planInfo > fallback em localStorage)
   // Importante: parênteses para evitar precedência incorreta entre `||` e ternário.
@@ -407,8 +447,13 @@ const PanelsGrid: React.FC<PanelsGridProps> = ({ activePanels }) => {
 
   return (
     <>
-    <div className="space-y-2 md:space-y-3">
-      {activePanels.map((panel) => {
+    <Reorder.Group
+      axis="y"
+      values={orderedPanels}
+      onReorder={setOrderedPanels}
+      className="space-y-2 md:space-y-3"
+    >
+      {orderedPanels.map((panel) => {
         const PanelIcon = getIconComponent(panel.icon);
         const panelModules = getPanelModules(panel.id);
         const template = getPanelTemplate(panel.id);
@@ -416,16 +461,25 @@ const PanelsGrid: React.FC<PanelsGridProps> = ({ activePanels }) => {
         const isCollapsed = collapsedPanels[panel.id] ?? false;
 
         return (
-          <div key={panel.id}>
+          <Reorder.Item
+            key={panel.id}
+            value={panel}
+            drag={isManualReorderEnabled ? 'y' : false}
+            className={isManualReorderEnabled ? 'animate-fade-in' : ''}
+          >
             <PanelTitleBar
               title={panel.name}
               icon={<PanelIcon className="h-5 w-5 text-primary" />}
+              description={panel.description}
               badge={
                 <div className="inline-flex h-8 min-w-8 items-center justify-center rounded-full bg-success text-success-foreground px-2 text-sm font-bold">
                   {panelModules.length}
                 </div>
               }
               isExpanded={!isCollapsed}
+              isReorderEnabled={isManualReorderEnabled}
+              onIconHoldStart={handleIconHoldStart}
+              onIconHoldEnd={handleIconHoldEnd}
               onToggle={() => setCollapsedPanels((prev) => ({ ...prev, [panel.id]: !(prev[panel.id] ?? false) }))}
             />
 
@@ -528,10 +582,10 @@ const PanelsGrid: React.FC<PanelsGridProps> = ({ activePanels }) => {
                 )}
                 </div>
               </div>
-          </div>
+          </Reorder.Item>
         );
       })}
-    </div>
+    </Reorder.Group>
 
     {/* Modal PIX para compra direta */}
     <PixQRCodeModal
