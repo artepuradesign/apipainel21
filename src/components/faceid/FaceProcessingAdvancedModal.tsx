@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import Delaunator from 'delaunator';
+import { Loader2 } from 'lucide-react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Progress } from '@/components/ui/progress';
 
@@ -10,6 +11,7 @@ type FaceProcessingAdvancedModalProps = {
   open: boolean;
   imageSrc: string | null;
   progress: number;
+  landmarks?: Landmark[] | null;
   title?: string;
   description?: string;
   details?: React.ReactNode;
@@ -41,6 +43,8 @@ const loadMediaPipe = async () => {
   const importFromUrl = new Function('url', 'return import(url)') as (url: string) => Promise<any>;
   return importFromUrl('https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.34/vision_bundle.mjs');
 };
+
+const landmarkCache = new Map<string, Landmark[]>();
 
 const buildDenseMesh = (points: Landmark[]) => {
   const edges = new Set<string>();
@@ -125,6 +129,7 @@ const FaceProcessingAdvancedModal = ({
   open,
   imageSrc,
   progress,
+  landmarks: providedLandmarks,
   title = 'Verificação facial em andamento',
   description = 'Mapeando landmarks faciais e refinando malha biométrica em tempo real.',
   details,
@@ -136,6 +141,7 @@ const FaceProcessingAdvancedModal = ({
   const [landmarks, setLandmarks] = useState<Landmark[]>([]);
   const [meshEdges, setMeshEdges] = useState<[number, number][]>([]);
   const [foregroundToken, setForegroundToken] = useState('0 0% 100%');
+  const [isPreparingAnimation, setIsPreparingAnimation] = useState(false);
 
   useEffect(() => {
     const styles = getComputedStyle(document.documentElement);
@@ -143,8 +149,32 @@ const FaceProcessingAdvancedModal = ({
   }, []);
 
   useEffect(() => {
+    let cancelled = false;
+
     const detect = async () => {
-      if (!open || !imageSrc) return;
+      if (!open || !imageSrc) {
+        setIsPreparingAnimation(false);
+        return;
+      }
+
+      setIsPreparingAnimation(true);
+
+      if (providedLandmarks && providedLandmarks.length > 0) {
+        if (cancelled) return;
+        setLandmarks(providedLandmarks);
+        setMeshEdges(buildDenseMesh(providedLandmarks));
+        setIsPreparingAnimation(false);
+        return;
+      }
+
+      const cached = landmarkCache.get(imageSrc);
+      if (cached && cached.length > 0) {
+        if (cancelled) return;
+        setLandmarks(cached);
+        setMeshEdges(buildDenseMesh(cached));
+        setIsPreparingAnimation(false);
+        return;
+      }
 
       const img = new Image();
       img.src = imageSrc;
@@ -174,12 +204,19 @@ const FaceProcessingAdvancedModal = ({
         points = fallbackPoints();
       }
 
+      landmarkCache.set(imageSrc, points);
+      if (cancelled) return;
       setLandmarks(points);
       setMeshEdges(buildDenseMesh(points));
+      setIsPreparingAnimation(false);
     };
 
     detect();
-  }, [open, imageSrc]);
+
+    return () => {
+      cancelled = true;
+    };
+  }, [open, imageSrc, providedLandmarks]);
 
   const pointOrder = useMemo(() => {
     if (landmarks.length === 0) return [] as Array<{ i: number; y: number; centerDistance: number }>;
@@ -199,7 +236,7 @@ const FaceProcessingAdvancedModal = ({
   }, [landmarks]);
 
   useEffect(() => {
-    if (!open || !canvasRef.current || !imageRef.current || landmarks.length === 0) return;
+    if (!open || isPreparingAnimation || !canvasRef.current || !imageRef.current || landmarks.length === 0) return;
 
     const canvas = canvasRef.current;
     const image = imageRef.current;
@@ -322,7 +359,7 @@ const FaceProcessingAdvancedModal = ({
       ctx.lineTo(imageBounds.x + imageBounds.width, scanY);
       ctx.stroke();
     }
-  }, [open, landmarks, meshEdges, pointOrder, progress, foregroundToken]);
+  }, [open, landmarks, meshEdges, pointOrder, progress, foregroundToken, isPreparingAnimation]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -335,14 +372,23 @@ const FaceProcessingAdvancedModal = ({
         <div className="relative overflow-hidden rounded-md border bg-muted/20">
             {imageSrc ? (
               <>
-                <img
-                  ref={imageRef}
-                  src={imageSrc}
-                  alt="Face enviada para validação"
-                  className="h-64 w-full object-contain bg-background/60 sm:h-80"
-                  loading="lazy"
-                />
-                <canvas ref={canvasRef} className="pointer-events-none absolute inset-0 h-full w-full" />
+                {isPreparingAnimation ? (
+                  <div className="flex h-64 flex-col items-center justify-center gap-2 text-sm text-muted-foreground sm:h-80">
+                    <Loader2 className="h-5 w-5 animate-spin" />
+                    <span>Preparando animação biométrica...</span>
+                  </div>
+                ) : (
+                  <>
+                    <img
+                      ref={imageRef}
+                      src={imageSrc}
+                      alt="Face enviada para validação"
+                      className="h-64 w-full object-contain bg-background/60 sm:h-80"
+                      loading="lazy"
+                    />
+                    <canvas ref={canvasRef} className="pointer-events-none absolute inset-0 h-full w-full" />
+                  </>
+                )}
               </>
             ) : (
               <div className="flex h-64 items-center justify-center text-sm text-muted-foreground">Aguardando imagem</div>
