@@ -27,6 +27,34 @@ const PanelTitleBar: React.FC<PanelTitleBarProps> = ({
   onToggle,
 }) => {
   const [isHelpBalloonOpen, setIsHelpBalloonOpen] = React.useState(false);
+  const [typedDescription, setTypedDescription] = React.useState('');
+
+  React.useEffect(() => {
+    if (!isHelpBalloonOpen || !description) {
+      setTypedDescription('');
+      return;
+    }
+
+    if (typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      setTypedDescription(description);
+      return;
+    }
+
+    let cursor = 0;
+    setTypedDescription('');
+
+    const timer = window.setInterval(() => {
+      cursor += 1;
+      const nextValue = description.slice(0, cursor);
+      setTypedDescription(nextValue);
+
+      if (cursor >= description.length) {
+        window.clearInterval(timer);
+      }
+    }, 20);
+
+    return () => window.clearInterval(timer);
+  }, [description, isHelpBalloonOpen]);
 
   return (
     <Card className="bg-card border-border">
@@ -55,13 +83,13 @@ const PanelTitleBar: React.FC<PanelTitleBarProps> = ({
                   type="button"
                   variant="outline"
                   size="icon"
-                  className="h-8 w-8 rounded-full"
+                  className="rounded-full h-8 w-8 shrink-0"
                   aria-label={`Ajuda sobre ${title}`}
                   onMouseEnter={() => setIsHelpBalloonOpen(true)}
                   onFocus={() => setIsHelpBalloonOpen(true)}
                   onClick={() => setIsHelpBalloonOpen((prev) => !prev)}
                 >
-                  <CircleHelp className="h-4 w-4" />
+                  <CircleHelp className="h-3.5 w-3.5" />
                 </Button>
                 {isHelpBalloonOpen ? (
                   <>
@@ -84,7 +112,7 @@ const PanelTitleBar: React.FC<PanelTitleBarProps> = ({
                       >
                         <X className="h-3.5 w-3.5" />
                       </button>
-                      <p className="text-sm text-popover-foreground leading-tight pr-1">{description}</p>
+                      <p className="text-sm text-popover-foreground leading-tight pr-1">{typedDescription || description}</p>
                     </div>
                   </>
                 ) : null}
