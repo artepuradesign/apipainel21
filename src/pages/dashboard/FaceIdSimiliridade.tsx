@@ -96,6 +96,8 @@ const FaceIdSimiliridade = () => {
   const [bestMatch, setBestMatch] = useState<SimilarityResult | null>(null);
   const [referenceLandmarks, setReferenceLandmarks] = useState<FaceLandmark[] | null>(null);
   const [detailResult, setDetailResult] = useState<SimilarityResult | null>(null);
+  const [detailLandmarks, setDetailLandmarks] = useState<FaceLandmark[] | null>(null);
+  const [loadingDetailId, setLoadingDetailId] = useState<number | null>(null);
   const [genderFilter, setGenderFilter] = useState<'male' | 'female'>('male');
   const [apiResponse, setApiResponse] = useState<Record<string, unknown> | null>(null);
   const [guidelinesCollapsed, setGuidelinesCollapsed] = useState(false);
@@ -216,6 +218,26 @@ const FaceIdSimiliridade = () => {
   const handleOpenDetail = async (item: SimilarityResult) => {
     closeDetailModal();
     setDetailResult(null);
+    setDetailLandmarks(null);
+
+    if (!item.photo_url) {
+      toast.error('Imagem da correspondência indisponível para detecção facial');
+      return;
+    }
+
+    setLoadingDetailId(item.id);
+    let landmarks: FaceLandmark[];
+
+    try {
+      landmarks = await extractLandmarksFromImage(item.photo_url);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Não foi possível detectar os pontos faciais');
+      setLoadingDetailId(null);
+      return;
+    }
+
+    setLoadingDetailId(null);
+    setDetailLandmarks(landmarks);
 
     setDetailResult(item);
     requestAnimationFrame(() => {
@@ -413,7 +435,10 @@ const FaceIdSimiliridade = () => {
                   </div>
                   <div className="mt-3 flex items-center justify-between gap-2">
                     <span className="text-[11px] text-muted-foreground">{item.data}</span>
-                    <Button variant="outline" size="sm" onClick={() => handleOpenDetail(item)}>Ver detalhes</Button>
+                    <Button variant="outline" size="sm" onClick={() => handleOpenDetail(item)} disabled={loadingDetailId === item.id}>
+                      {loadingDetailId === item.id ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                      {loadingDetailId === item.id ? 'Escaneando...' : 'Ver detalhes'}
+                    </Button>
                   </div>
                 </div>
               ))
@@ -458,7 +483,10 @@ const FaceIdSimiliridade = () => {
                     <TableCell>{item.similaridade}%</TableCell>
                     <TableCell>{item.data}</TableCell>
                     <TableCell className="text-right">
-                      <Button variant="outline" size="sm" onClick={() => handleOpenDetail(item)}>Ver detalhes</Button>
+                      <Button variant="outline" size="sm" onClick={() => handleOpenDetail(item)} disabled={loadingDetailId === item.id}>
+                        {loadingDetailId === item.id ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                        {loadingDetailId === item.id ? 'Escaneando...' : 'Ver detalhes'}
+                      </Button>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -482,6 +510,7 @@ const FaceIdSimiliridade = () => {
         imageSrc={detailResult?.photo_url || null}
         progress={detailProgress}
         title="Detalhes da correspondência"
+        landmarks={detailLandmarks}
         description="Mapeando landmarks faciais e refinando malha biométrica em tempo real."
         showProgress
         details={
@@ -498,6 +527,7 @@ const FaceIdSimiliridade = () => {
           if (!open) {
             closeDetailModal();
             setDetailResult(null);
+            setDetailLandmarks(null);
           }
         }}
       />
