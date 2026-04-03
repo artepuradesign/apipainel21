@@ -1,7 +1,8 @@
 import React from 'react';
 import { Card, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ChevronDown, ChevronUp, CircleHelp, X } from 'lucide-react';
+import { ArrowLeft, ChevronDown, ChevronUp, CircleHelp, Plus, RefreshCw, X } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 interface PanelTitleBarProps {
   title: string;
@@ -10,8 +11,10 @@ interface PanelTitleBarProps {
   badge?: React.ReactNode;
   isExpanded?: boolean;
   isReorderEnabled?: boolean;
+  showAddButton?: boolean;
   onIconHoldStart?: () => void;
   onIconHoldEnd?: () => void;
+  onAdd?: () => void;
   onToggle?: () => void;
 }
 
@@ -22,15 +25,26 @@ const PanelTitleBar: React.FC<PanelTitleBarProps> = ({
   badge,
   isExpanded = true,
   isReorderEnabled = false,
+  showAddButton = false,
   onIconHoldStart,
   onIconHoldEnd,
+  onAdd,
   onToggle,
 }) => {
+  const navigate = useNavigate();
   const [isHelpBalloonOpen, setIsHelpBalloonOpen] = React.useState(false);
   const [typedDescription, setTypedDescription] = React.useState('');
   const [isMobileViewport, setIsMobileViewport] = React.useState(() => (typeof window !== 'undefined' ? window.innerWidth < 640 : false));
   const [mobileBalloonTop, setMobileBalloonTop] = React.useState<number | undefined>(undefined);
   const helpButtonRef = React.useRef<HTMLButtonElement | null>(null);
+  const helpHoverTimerRef = React.useRef<number | null>(null);
+
+  const clearHelpHoverTimer = React.useCallback(() => {
+    if (helpHoverTimerRef.current !== null) {
+      window.clearTimeout(helpHoverTimerRef.current);
+      helpHoverTimerRef.current = null;
+    }
+  }, []);
 
   const updateMobileBalloonPosition = React.useCallback(() => {
     if (typeof window === 'undefined') return;
@@ -50,6 +64,8 @@ const PanelTitleBar: React.FC<PanelTitleBarProps> = ({
   }, [updateMobileBalloonPosition]);
 
   const toggleHelpBalloon = React.useCallback(() => {
+    clearHelpHoverTimer();
+
     if (isHelpBalloonOpen) {
       setIsHelpBalloonOpen(false);
       return;
@@ -57,7 +73,15 @@ const PanelTitleBar: React.FC<PanelTitleBarProps> = ({
 
     updateMobileBalloonPosition();
     setIsHelpBalloonOpen(true);
-  }, [isHelpBalloonOpen, updateMobileBalloonPosition]);
+  }, [clearHelpHoverTimer, isHelpBalloonOpen, updateMobileBalloonPosition]);
+
+  const scheduleHelpBalloonOpen = React.useCallback(() => {
+    clearHelpHoverTimer();
+    helpHoverTimerRef.current = window.setTimeout(() => {
+      openHelpBalloon();
+      helpHoverTimerRef.current = null;
+    }, 2000);
+  }, [clearHelpHoverTimer, openHelpBalloon]);
 
   React.useEffect(() => {
     updateMobileBalloonPosition();
@@ -69,6 +93,10 @@ const PanelTitleBar: React.FC<PanelTitleBarProps> = ({
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, [updateMobileBalloonPosition]);
+
+  React.useEffect(() => {
+    return () => clearHelpHoverTimer();
+  }, [clearHelpHoverTimer]);
 
   React.useEffect(() => {
     if (!isHelpBalloonOpen || !description) {
@@ -116,6 +144,26 @@ const PanelTitleBar: React.FC<PanelTitleBarProps> = ({
           <CardTitle className="text-base md:text-lg leading-none truncate">{title}</CardTitle>
           <div className="ml-auto flex items-center gap-2 shrink-0">
             {badge ? <div>{badge}</div> : null}
+            <Button
+              type="button"
+              variant="outline"
+              size="icon"
+              className="rounded-full h-8 w-8 shrink-0"
+              aria-label="Voltar"
+              onClick={() => (window.history.length > 1 ? navigate(-1) : navigate('/dashboard'))}
+            >
+              <ArrowLeft className="h-3.5 w-3.5" />
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              size="icon"
+              className="rounded-full h-8 w-8 shrink-0"
+              aria-label="Atualizar página"
+              onClick={() => window.location.reload()}
+            >
+              <RefreshCw className="h-3.5 w-3.5" />
+            </Button>
             {description ? (
               <div
                 className="relative"
@@ -127,13 +175,27 @@ const PanelTitleBar: React.FC<PanelTitleBarProps> = ({
                   size="icon"
                   className="rounded-full h-8 w-8 shrink-0"
                   aria-label={`Ajuda sobre ${title}`}
-                  onMouseEnter={openHelpBalloon}
-                  onFocus={openHelpBalloon}
+                  onMouseEnter={scheduleHelpBalloonOpen}
+                  onMouseLeave={clearHelpHoverTimer}
+                  onFocus={clearHelpHoverTimer}
+                  onBlur={clearHelpHoverTimer}
                   onClick={toggleHelpBalloon}
                 >
                   <CircleHelp className="h-3.5 w-3.5" />
                 </Button>
               </div>
+            ) : null}
+            {showAddButton ? (
+              <Button
+                type="button"
+                variant="outline"
+                size="icon"
+                className="h-8 w-8 rounded-full shrink-0"
+                aria-label="Adicionar"
+                onClick={onAdd}
+              >
+                <Plus className="h-4 w-4" />
+              </Button>
             ) : null}
             {onToggle ? (
               <Button

@@ -482,8 +482,10 @@ const PanelsGrid: React.FC<PanelsGridProps> = ({ activePanels }) => {
               }
               isExpanded={!isCollapsed}
               isReorderEnabled={isManualReorderEnabled}
+              showAddButton={canConfigureModules}
               onIconHoldStart={handleIconHoldStart}
               onIconHoldEnd={handleIconHoldEnd}
+              onAdd={() => navigate('/dashboard/personalizacao')}
               onToggle={() => setCollapsedPanels((prev) => ({ ...prev, [panel.id]: !(prev[panel.id] ?? false) }))}
             />
 
