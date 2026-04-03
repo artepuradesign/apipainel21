@@ -3,9 +3,10 @@ import React, { useEffect } from 'react';
 import UnifiedAdminStatsCards from '@/components/dashboard/UnifiedAdminStatsCards';
 import AdminRecentTransactions from '@/components/dashboard/AdminRecentTransactions';
 import OnlineUsersLeaderboard from '@/components/dashboard/OnlineUsersLeaderboard';
-import DashboardTitleCard from '@/components/dashboard/DashboardTitleCard';
+import SimpleTitleBar from '@/components/dashboard/SimpleTitleBar';
 import { ShieldCheck } from 'lucide-react';
 import { getDashboardPageClassName } from '@/components/dashboard/layout/dashboardPageTemplate';
+import { useNavigate } from 'react-router-dom';
 
 import { useAuth } from '@/contexts/AuthContext';
 import { useApiDashboardAdmin } from '@/hooks/useApiDashboardAdmin';
@@ -34,6 +35,7 @@ const textByLocale: Record<Locale, { denied: string; noPermission: string; title
 };
 
 const DashboardAdmin = () => {
+  const navigate = useNavigate();
   const { isSupport } = useAuth();
   const { locale } = useLocale();
   const t = textByLocale[locale];
@@ -153,11 +155,12 @@ const DashboardAdmin = () => {
 
   return (
     <div className={getDashboardPageClassName('standard')}>
-      <DashboardTitleCard
+      <SimpleTitleBar
         title={t.title}
         subtitle={t.subtitle}
         icon={<ShieldCheck className="h-4 w-4 sm:h-5 sm:w-5" />}
-        backTo="/dashboard"
+        onBack={() => navigate('/dashboard')}
+        useModuleMetadata={false}
       />
 
       {/* Stats Cards Unificados - 3 linhas de 4 cards */}
