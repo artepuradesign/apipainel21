@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import Delaunator from 'delaunator';
 import { Loader2 } from 'lucide-react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 
 type Landmark = { x: number; y: number; z?: number };
@@ -12,6 +13,7 @@ type FaceProcessingAdvancedModalProps = {
   imageSrc: string | null;
   progress: number;
   landmarks?: Landmark[] | null;
+  enablePostScan3D?: boolean;
   title?: string;
   description?: string;
   details?: React.ReactNode;
@@ -130,6 +132,7 @@ const FaceProcessingAdvancedModal = ({
   imageSrc,
   progress,
   landmarks: providedLandmarks,
+  enablePostScan3D = false,
   title = 'Verificação facial em andamento',
   description = 'Mapeando landmarks faciais e refinando malha biométrica em tempo real.',
   details,
@@ -138,15 +141,29 @@ const FaceProcessingAdvancedModal = ({
 }: FaceProcessingAdvancedModalProps) => {
   const imageRef = useRef<HTMLImageElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const canvas3dRef = useRef<HTMLCanvasElement | null>(null);
   const [landmarks, setLandmarks] = useState<Landmark[]>([]);
   const [meshEdges, setMeshEdges] = useState<[number, number][]>([]);
   const [foregroundToken, setForegroundToken] = useState('0 0% 100%');
   const [isPreparingAnimation, setIsPreparingAnimation] = useState(false);
+  const [viewMode, setViewMode] = useState<'2d' | '3d'>('2d');
 
   useEffect(() => {
     const styles = getComputedStyle(document.documentElement);
     setForegroundToken(styles.getPropertyValue('--foreground').trim() || '0 0% 100%');
   }, []);
+
+  useEffect(() => {
+    if (!open) {
+      setViewMode('2d');
+    }
+  }, [open, imageSrc]);
+
+  useEffect(() => {
+    if (enablePostScan3D && progress >= 100 && landmarks.length > 0) {
+      setViewMode('3d');
+    }
+  }, [enablePostScan3D, progress, landmarks.length]);
 
   useEffect(() => {
     let cancelled = false;
@@ -362,6 +379,111 @@ const FaceProcessingAdvancedModal = ({
     }
   }, [open, landmarks, meshEdges, pointOrder, progress, foregroundToken, isPreparingAnimation]);
 
+  useEffect(() => {
+    if (!open || viewMode !== '3d' || !canvas3dRef.current || landmarks.length === 0) return;
+
+    const canvas = canvas3dRef.current;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const center = landmarks.reduce(
+      (acc, p) => ({ x: acc.x + p.x, y: acc.y + p.y, z: acc.z + (p.z ?? 0) }),
+      { x: 0, y: 0, z: 0 }
+    );
+
+    center.x /= landmarks.length;
+    center.y /= landmarks.length;
+    center.z /= landmarks.length;
+
+    const maxRadius = Math.max(
+      0.001,
+      ...landmarks.map((p) =>
+        Math.sqrt(
+          (p.x - center.x) * (p.x - center.x) +
+            (p.y - center.y) * (p.y - center.y) +
+            ((p.z ?? 0) - center.z) * ((p.z ?? 0) - center.z)
+        )
+      )
+    );
+
+    let raf = 0;
+    let angle = 0;
+
+    const draw = () => {
+      if (!canvas.parentElement) return;
+      const width = canvas.parentElement.clientWidth || 1;
+      const height = canvas.parentElement.clientHeight || 1;
+      if (canvas.width !== width || canvas.height !== height) {
+        canvas.width = width;
+        canvas.height = height;
+      }
+
+      const cx = width * 0.5;
+      const cy = height * 0.52;
+      const scale = Math.min(width, height) * 0.36;
+
+      ctx.clearRect(0, 0, width, height);
+
+      const cosY = Math.cos(angle);
+      const sinY = Math.sin(angle);
+      const tilt = 0.22;
+      const cosX = Math.cos(tilt);
+      const sinX = Math.sin(tilt);
+
+      const projected = landmarks.map((p) => {
+        const nx = (p.x - center.x) / maxRadius;
+        const ny = (p.y - center.y) / maxRadius;
+        const nz = ((p.z ?? 0) - center.z) / maxRadius;
+
+        const ryX = nx * cosY - nz * sinY;
+        const ryZ = nx * sinY + nz * cosY;
+
+        const rxY = ny * cosX - ryZ * sinX;
+        const rxZ = ny * sinX + ryZ * cosX;
+
+        const perspective = 1 / (1 + (rxZ + 1.2) * 0.45);
+
+        return {
+          x: cx + ryX * scale * perspective,
+          y: cy + rxY * scale * perspective,
+          z: rxZ,
+          perspective,
+        };
+      });
+
+      ctx.lineWidth = 0.55;
+      for (let i = 0; i < meshEdges.length; i++) {
+        const [a, b] = meshEdges[i];
+        const pa = projected[a];
+        const pb = projected[b];
+        if (!pa || !pb) continue;
+        const alpha = 0.18 + Math.max(pa.perspective, pb.perspective) * 0.45;
+        ctx.strokeStyle = cssHslToHsla(foregroundToken, alpha);
+        ctx.beginPath();
+        ctx.moveTo(pa.x, pa.y);
+        ctx.lineTo(pb.x, pb.y);
+        ctx.stroke();
+      }
+
+      for (let i = 0; i < projected.length; i++) {
+        const p = projected[i];
+        const alpha = 0.45 + p.perspective * 0.45;
+        ctx.fillStyle = cssHslToHsla(foregroundToken, alpha);
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 0.7 + p.perspective * 1.45, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      angle += 0.015;
+      raf = window.requestAnimationFrame(draw);
+    };
+
+    raf = window.requestAnimationFrame(draw);
+    return () => {
+      window.cancelAnimationFrame(raf);
+    };
+  }, [open, viewMode, landmarks, meshEdges, foregroundToken]);
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-3xl">
@@ -380,14 +502,22 @@ const FaceProcessingAdvancedModal = ({
                   </div>
                 ) : (
                   <>
-                    <img
-                      ref={imageRef}
-                      src={imageSrc}
-                      alt="Face enviada para validação"
-                      className="h-64 w-full object-contain bg-background/60 sm:h-80"
-                      loading="lazy"
-                    />
-                    <canvas ref={canvasRef} className="pointer-events-none absolute inset-0 h-full w-full" />
+                    {viewMode === '3d' ? (
+                      <div className="relative h-64 w-full bg-background/60 sm:h-80">
+                        <canvas ref={canvas3dRef} className="pointer-events-none absolute inset-0 h-full w-full" />
+                      </div>
+                    ) : (
+                      <>
+                        <img
+                          ref={imageRef}
+                          src={imageSrc}
+                          alt="Face enviada para validação"
+                          className="h-64 w-full object-contain bg-background/60 sm:h-80"
+                          loading="lazy"
+                        />
+                        <canvas ref={canvasRef} className="pointer-events-none absolute inset-0 h-full w-full" />
+                      </>
+                    )}
                   </>
                 )}
               </>
@@ -395,6 +525,17 @@ const FaceProcessingAdvancedModal = ({
               <div className="flex h-64 items-center justify-center text-sm text-muted-foreground">Aguardando imagem</div>
             )}
         </div>
+
+        {enablePostScan3D && progress >= 100 && landmarks.length > 0 ? (
+          <div className="flex items-center justify-end gap-2">
+            <Button variant={viewMode === '2d' ? 'default' : 'outline'} size="sm" onClick={() => setViewMode('2d')}>
+              Visualização 2D
+            </Button>
+            <Button variant={viewMode === '3d' ? 'default' : 'outline'} size="sm" onClick={() => setViewMode('3d')}>
+              Visualização 3D
+            </Button>
+          </div>
+        ) : null}
 
         {showProgress ? (
           <div className="space-y-2">
