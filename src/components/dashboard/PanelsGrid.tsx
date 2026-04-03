@@ -86,6 +86,7 @@ const PanelsGrid: React.FC<PanelsGridProps> = ({ activePanels }) => {
   const [purchasingModule, setPurchasingModule] = useState<{ title: string; route: string } | null>(null);
   const [showFloatingPix, setShowFloatingPix] = useState(false);
   const [notificationToastId, setNotificationToastId] = useState<string | number | null>(null);
+  const [collapsedPanels, setCollapsedPanels] = useState<Record<number, boolean>>({});
   
   // Obter plano atual (subscription > planInfo > fallback em localStorage)
   // Importante: parênteses para evitar precedência incorreta entre `||` e ternário.
@@ -412,22 +413,26 @@ const PanelsGrid: React.FC<PanelsGridProps> = ({ activePanels }) => {
         const panelModules = getPanelModules(panel.id);
         const template = getPanelTemplate(panel.id);
         
+        const isCollapsed = collapsedPanels[panel.id] ?? false;
+
         return (
-          <div key={panel.id} className={`${glassClass} rounded-lg`} style={glassStyle}>
-            <div className="px-2 pt-2 md:px-3 md:pt-3">
-              <PanelTitleBar
-                title={panel.name}
-                icon={<PanelIcon className="h-5 w-5 text-primary" />}
-                badge={
-                  <div className="inline-flex h-8 min-w-8 items-center justify-center rounded-full bg-success text-success-foreground px-2 text-sm font-bold">
-                    {panelModules.length}
-                  </div>
-                }
-              />
-            </div>
-            
-            {panelModules.length > 0 ? (
-              <ModuleGridWrapper className={isMobile ? 'py-1 px-2 pb-2' : 'px-3 pt-2 pb-3 md:px-4 md:pt-2 md:pb-4'}>
+          <div key={panel.id} className="space-y-2 md:space-y-3">
+            <PanelTitleBar
+              title={panel.name}
+              icon={<PanelIcon className="h-5 w-5 text-primary" />}
+              badge={
+                <div className="inline-flex h-8 min-w-8 items-center justify-center rounded-full bg-success text-success-foreground px-2 text-sm font-bold">
+                  {panelModules.length}
+                </div>
+              }
+              isExpanded={!isCollapsed}
+              onToggle={() => setCollapsedPanels((prev) => ({ ...prev, [panel.id]: !(prev[panel.id] ?? false) }))}
+            />
+
+            <div className={`overflow-hidden transition-all duration-300 ease-out ${isCollapsed ? 'max-h-0 opacity-0 -translate-y-1 pointer-events-none' : 'max-h-[3000px] opacity-100 translate-y-0'}`}>
+              <div className={`${glassClass} rounded-lg`} style={glassStyle}>
+                {panelModules.length > 0 ? (
+                  <ModuleGridWrapper className={isMobile ? 'py-1 px-2 pb-2' : 'px-3 pt-2 pb-3 md:px-4 md:pt-2 md:pb-4'}>
                  {panelModules.map((module) => {
                    // Calcular preços - apenas com desconto se houver plano ativo da API
                    // Painel 38 não deve mostrar desconto
@@ -498,29 +503,31 @@ const PanelsGrid: React.FC<PanelsGridProps> = ({ activePanels }) => {
                       )}
                     </div>
                   );
-                })}
-              </ModuleGridWrapper>
-            ) : (
-              <div className="p-6 pt-0">
-                <div className="text-center py-8 bg-gray-50 dark:bg-gray-700/50 rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-600">
-                  <Package className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                    Nenhum módulo ativo
-                  </h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-                    Este painel não possui módulos ativos configurados.
-                  </p>
-                  {canConfigureModules ? (
-                    <Link 
-                      to="/dashboard/personalizacao"
-                      className="inline-flex items-center text-sm text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 font-medium"
-                    >
-                      Configurar módulos →
-                    </Link>
-                  ) : null}
+                  })}
+                  </ModuleGridWrapper>
+                ) : (
+                  <div className="p-6 pt-0">
+                    <div className="text-center py-8 bg-gray-50 dark:bg-gray-700/50 rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-600">
+                      <Package className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+                        Nenhum módulo ativo
+                      </h3>
+                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+                        Este painel não possui módulos ativos configurados.
+                      </p>
+                      {canConfigureModules ? (
+                        <Link 
+                          to="/dashboard/personalizacao"
+                          className="inline-flex items-center text-sm text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 font-medium"
+                        >
+                          Configurar módulos →
+                        </Link>
+                      ) : null}
+                    </div>
+                  </div>
+                )}
                 </div>
               </div>
-            )}
           </div>
         );
       })}
