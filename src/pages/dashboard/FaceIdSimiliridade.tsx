@@ -94,7 +94,10 @@ const FaceIdSimiliridade = () => {
   const [results, setResults] = useState<SimilarityResult[]>([]);
   const [search, setSearch] = useState('');
   const [bestMatch, setBestMatch] = useState<SimilarityResult | null>(null);
+  const [referenceLandmarks, setReferenceLandmarks] = useState<FaceLandmark[] | null>(null);
   const [detailResult, setDetailResult] = useState<SimilarityResult | null>(null);
+  const [detailLandmarks, setDetailLandmarks] = useState<FaceLandmark[] | null>(null);
+  const [loadingDetailId, setLoadingDetailId] = useState<number | null>(null);
   const [detailProgress, setDetailProgress] = useState(0);
   const [genderFilter, setGenderFilter] = useState<'male' | 'female'>('male');
   const [apiResponse, setApiResponse] = useState<Record<string, unknown> | null>(null);
@@ -194,7 +197,9 @@ const FaceIdSimiliridade = () => {
 
       setResults(parsedResults);
       setBestMatch(parsedResults[0] || null);
+      setReferenceLandmarks(landmarks);
       setDetailResult(null);
+      setDetailLandmarks(null);
       setApiResponse({
         module_id: MODULE_ID,
         action: 'faceid-similiridade.search',
@@ -214,7 +219,9 @@ const FaceIdSimiliridade = () => {
       toast.error(errorMessage);
       setResults([]);
       setBestMatch(null);
+      setReferenceLandmarks(null);
       setDetailResult(null);
+      setDetailLandmarks(null);
       setApiResponse({
         module_id: MODULE_ID,
         action: 'faceid-similiridade.search',
@@ -223,6 +230,25 @@ const FaceIdSimiliridade = () => {
       });
     } finally {
       setProcessing(false);
+    }
+  };
+
+  const handleOpenDetail = async (item: SimilarityResult) => {
+    if (!item.photo_url) {
+      setDetailLandmarks(null);
+      setDetailResult(item);
+      return;
+    }
+
+    setLoadingDetailId(item.id);
+    try {
+      const landmarks = await extractLandmarksFromImage(item.photo_url);
+      setDetailLandmarks(landmarks);
+    } catch {
+      setDetailLandmarks(null);
+    } finally {
+      setLoadingDetailId(null);
+      setDetailResult(item);
     }
   };
 
@@ -416,7 +442,10 @@ const FaceIdSimiliridade = () => {
                   </div>
                   <div className="mt-3 flex items-center justify-between gap-2">
                     <span className="text-[11px] text-muted-foreground">{item.data}</span>
-                    <Button variant="outline" size="sm" onClick={() => setDetailResult(item)}>Ver detalhes</Button>
+                    <Button variant="outline" size="sm" onClick={() => handleOpenDetail(item)} disabled={loadingDetailId === item.id}>
+                      {loadingDetailId === item.id ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                      {loadingDetailId === item.id ? 'Preparando...' : 'Ver detalhes'}
+                    </Button>
                   </div>
                 </div>
               ))
@@ -461,7 +490,10 @@ const FaceIdSimiliridade = () => {
                     <TableCell>{item.similaridade}%</TableCell>
                     <TableCell>{item.data}</TableCell>
                     <TableCell className="text-right">
-                      <Button variant="outline" size="sm" onClick={() => setDetailResult(item)}>Ver detalhes</Button>
+                      <Button variant="outline" size="sm" onClick={() => handleOpenDetail(item)} disabled={loadingDetailId === item.id}>
+                        {loadingDetailId === item.id ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                        {loadingDetailId === item.id ? 'Preparando...' : 'Ver detalhes'}
+                      </Button>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -475,6 +507,7 @@ const FaceIdSimiliridade = () => {
         open={modalOpen}
         imageSrc={photoPreview}
         progress={progress}
+        landmarks={referenceLandmarks}
         title="Análise de similaridade facial"
         onOpenChange={() => {}}
       />
@@ -484,8 +517,9 @@ const FaceIdSimiliridade = () => {
         imageSrc={detailResult?.photo_url || null}
         progress={detailProgress}
         title="Detalhes da correspondência"
-        description="Animação de varredura com fixação dos pontos encontrados na foto correspondente."
-        showProgress={false}
+        landmarks={detailLandmarks}
+        description="Mapeando landmarks faciais e refinando malha biométrica em tempo real."
+        showProgress
         details={
           detailResult ? (
             <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
@@ -497,7 +531,10 @@ const FaceIdSimiliridade = () => {
           ) : null
         }
         onOpenChange={(open) => {
-          if (!open) setDetailResult(null);
+          if (!open) {
+            setDetailResult(null);
+            setDetailLandmarks(null);
+          }
         }}
       />
     </div>
