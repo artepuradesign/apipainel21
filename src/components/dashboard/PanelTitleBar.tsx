@@ -39,9 +39,6 @@ const PanelTitleBar: React.FC<PanelTitleBarProps> = ({
               onPointerDown={onIconHoldStart}
               onPointerUp={onIconHoldEnd}
               onPointerLeave={onIconHoldEnd}
-              onTouchStart={onIconHoldStart}
-              onTouchEnd={onIconHoldEnd}
-              onTouchCancel={onIconHoldEnd}
             >
               {icon}
             </button>
