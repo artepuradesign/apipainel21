@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -6,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Car, Search, AlertCircle, CheckCircle } from 'lucide-react';
 import { toast } from 'sonner';
-import PageHeaderCard from '@/components/dashboard/PageHeaderCard';
+import SimpleTitleBar from '@/components/dashboard/SimpleTitleBar';
 import ModuleStatsCards from '@/components/dashboard/stats/ModuleStatsCards';
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@/components/ui/table';
 import { calculateDiscountedPrice } from '@/utils/planUtils';
@@ -27,6 +28,7 @@ interface VehicleResult {
 }
 
 const ConsultarVeiculoNew = () => {
+  const navigate = useNavigate();
   const { user } = useAuth();
   const [placa, setPlaca] = useState('');
   const [loading, setLoading] = useState(false);
@@ -142,9 +144,11 @@ const ConsultarVeiculoNew = () => {
 
   return (
     <div className="space-y-6">
-      <PageHeaderCard 
-        title="Consultar Veículo" 
+      <SimpleTitleBar
+        title="Consultar Veículo"
         subtitle="Consulte informações completas do veículo"
+        icon={<Car className="h-5 w-5" />}
+        onBack={() => navigate('/dashboard')}
       />
 
       <ModuleStatsCards 

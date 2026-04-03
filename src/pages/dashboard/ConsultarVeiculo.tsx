@@ -1,5 +1,6 @@
 
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Card,
   CardContent,
@@ -13,12 +14,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Search, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { toast } from "sonner";
-import PageHeaderCard from '@/components/dashboard/PageHeaderCard';
+import SimpleTitleBar from '@/components/dashboard/SimpleTitleBar';
 import { useAuth } from '@/contexts/AuthContext';
 import { useWalletBalance } from '@/hooks/useWalletBalance';
 import { consultationApiService } from '@/services/consultationApiService';
 
 const ConsultarVeiculo = () => {
+  const navigate = useNavigate();
   const [placa, setPlaca] = useState('');
   const [chassi, setChassi] = useState('');
   const [searchType, setSearchType] = useState<'placa' | 'chassi'>('placa');
@@ -153,10 +155,11 @@ const ConsultarVeiculo = () => {
 
   return (
     <div className="space-y-6">
-      {/* Dashboard Header - Updated to use PageHeaderCard */}
-      <PageHeaderCard 
-        title="Consultar Veículo" 
+      <SimpleTitleBar
+        title="Consultar Veículo"
         subtitle="Bem Vindo: Usuário X / Plano: Plano Black"
+        icon={<Search className="h-5 w-5" />}
+        onBack={() => navigate('/dashboard')}
       />
       
       <div className="max-w-3xl mx-auto space-y-6">

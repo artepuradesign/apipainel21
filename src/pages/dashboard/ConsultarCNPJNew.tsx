@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -6,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Building2, Search, AlertCircle, CheckCircle } from 'lucide-react';
 import { toast } from 'sonner';
-import PageHeaderCard from '@/components/dashboard/PageHeaderCard';
+import SimpleTitleBar from '@/components/dashboard/SimpleTitleBar';
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@/components/ui/table';
 import { useAuth } from '@/contexts/AuthContext';
 import { useWalletBalance } from '@/hooks/useWalletBalance';
@@ -25,6 +26,7 @@ interface CNPJResult {
 }
 
 const ConsultarCNPJNew = () => {
+  const navigate = useNavigate();
   const [cnpj, setCnpj] = useState('');
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<CNPJResult | null>(null);
@@ -161,9 +163,11 @@ const ConsultarCNPJNew = () => {
 
   return (
     <div className="space-y-6">
-      <PageHeaderCard 
-        title="Consultar CNPJ" 
+      <SimpleTitleBar
+        title="Consultar CNPJ"
         subtitle="Consulte informações completas do CNPJ"
+        icon={<Building2 className="h-5 w-5" />}
+        onBack={() => navigate('/dashboard')}
       />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

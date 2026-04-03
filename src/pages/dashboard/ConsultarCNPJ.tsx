@@ -1,12 +1,12 @@
 
 import React, { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Search, Building2, AlertTriangle, Download } from "lucide-react";
 import { toast } from "sonner";
-import PageHeaderCard from '@/components/dashboard/PageHeaderCard';
+import SimpleTitleBar from '@/components/dashboard/SimpleTitleBar';
 import { useAuth } from '@/contexts/AuthContext';
 import { useWalletBalance } from '@/hooks/useWalletBalance';
 import { consultationApiService } from '@/services/consultationApiService';
@@ -46,6 +46,7 @@ const mockCnpjData = {
 
 const ConsultarCNPJ = () => {
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const [cnpj, setCnpj] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState<typeof mockCnpjData | null>(null);
@@ -183,11 +184,11 @@ const ConsultarCNPJ = () => {
 
   return (
     <div className="space-y-6">
-      {/* Page Header */}
-      <PageHeaderCard 
-        title="Consultar CNPJ" 
-        subtitle="Busque informações detalhadas por CNPJ"
-        badgeText="3 créditos"
+      <SimpleTitleBar
+        title="Consultar CNPJ"
+        subtitle="Busque informações detalhadas por CNPJ • 3 créditos"
+        icon={<Building2 className="h-5 w-5" />}
+        onBack={() => navigate('/dashboard')}
       />
       
       {/* Search Form */}
