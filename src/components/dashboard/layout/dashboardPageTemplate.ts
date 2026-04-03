@@ -1,12 +1,12 @@
 export type DashboardSpacingVariant = 'standard' | 'compact';
 
 const dashboardSpacingByVariant: Record<DashboardSpacingVariant, string> = {
-  standard: 'space-y-4 sm:space-y-6',
+  standard: 'space-y-2 md:space-y-3',
   compact: 'space-y-2 md:space-y-3',
 };
 
 const dashboardHeaderGapByVariant: Record<DashboardSpacingVariant, string> = {
-  standard: 'mt-4 md:mt-6',
+  standard: 'mt-2 md:mt-3',
   compact: 'mt-2 md:mt-3',
 };
 
