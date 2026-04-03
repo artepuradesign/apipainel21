@@ -4,7 +4,6 @@ import { LucideIcon, Plus, PlusCircle, Search, CalendarDays, Wallet, Users, File
 import { addMonths, startOfMonth } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { useNavigate } from 'react-router-dom';
-import PageHeaderCard from '@/components/dashboard/PageHeaderCard';
 import SimpleTitleBar from '@/components/dashboard/SimpleTitleBar';
 import AgendaTimeRangePicker, { hasRangeConflict, timeToMinutes } from '@/components/dashboard/controle-pessoal/AgendaTimeRangePicker';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
