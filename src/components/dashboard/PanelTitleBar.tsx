@@ -1,7 +1,7 @@
 import React from 'react';
 import { Card, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, ChevronDown, ChevronUp, CircleHelp, Plus, X } from 'lucide-react';
+import { ChevronDown, ChevronUp, CircleHelp, Plus, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 interface PanelTitleBarProps {
@@ -144,16 +144,6 @@ const PanelTitleBar: React.FC<PanelTitleBarProps> = ({
           <CardTitle className="text-base md:text-lg leading-none truncate">{title}</CardTitle>
           <div className="ml-auto flex items-center gap-2 shrink-0">
             {badge ? <div>{badge}</div> : null}
-            <Button
-              type="button"
-              variant="outline"
-              size="icon"
-              className="rounded-full h-8 w-8 shrink-0"
-              aria-label="Voltar"
-              onClick={() => (window.history.length > 1 ? navigate(-1) : navigate('/dashboard'))}
-            >
-              <ArrowLeft className="h-3.5 w-3.5" />
-            </Button>
             {description ? (
               <div
                 className="relative"
