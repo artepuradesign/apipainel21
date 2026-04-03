@@ -185,3 +185,20 @@ body {
   }
   
 }
+
+/* ===== Dashboard spacing standardization ===== */
+.dashboard-content .space-y-4.sm\:space-y-6 > :not([hidden]) ~ :not([hidden]),
+.dashboard-content .space-y-3.sm\:space-y-6 > :not([hidden]) ~ :not([hidden]),
+.dashboard-content .space-y-3.md\:space-y-4 > :not([hidden]) ~ :not([hidden]),
+.dashboard-content .space-y-4.md\:space-y-6 > :not([hidden]) ~ :not([hidden]) {
+  margin-top: 0.5rem !important;
+}
+
+@media (min-width: 768px) {
+  .dashboard-content .space-y-4.sm\:space-y-6 > :not([hidden]) ~ :not([hidden]),
+  .dashboard-content .space-y-3.sm\:space-y-6 > :not([hidden]) ~ :not([hidden]),
+  .dashboard-content .space-y-3.md\:space-y-4 > :not([hidden]) ~ :not([hidden]),
+  .dashboard-content .space-y-4.md\:space-y-6 > :not([hidden]) ~ :not([hidden]) {
+    margin-top: 0.75rem !important;
+  }
+}

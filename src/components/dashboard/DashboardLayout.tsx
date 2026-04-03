@@ -236,6 +236,7 @@ const DashboardLayout = ({
           {/* Main content */}
           <main 
             className={`
+              dashboard-content
               flex-1 
               relative 
               z-20 

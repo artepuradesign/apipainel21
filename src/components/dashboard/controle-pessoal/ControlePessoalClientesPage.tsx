@@ -28,6 +28,7 @@ import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
 import { useAuth } from '@/contexts/AuthContext';
 import { useApiModules } from '@/hooks/useApiModules';
+import { getDashboardPageClassName } from '@/components/dashboard/layout/dashboardPageTemplate';
 import { formatCpf, formatPhone } from '@/utils/formatters';
 import { todayBrasilia } from '@/utils/timezone';
 import { baseCpfService } from '@/services/baseCpfService';
@@ -697,7 +698,7 @@ const ControlePessoalClientesPage = () => {
   );
 
   return (
-    <div className="space-y-3 md:space-y-4">
+    <div className={getDashboardPageClassName('standard')}>
       <SimpleTitleBar
         title="Controle Pessoal • Clientes"
         subtitle="Consulte CPF, salve clientes pagos e use cadastro manual somente quando não houver retorno"
