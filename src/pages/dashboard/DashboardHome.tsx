@@ -16,6 +16,7 @@ import * as Icons from 'lucide-react';
 import { useModuleRecords } from '@/hooks/useModuleRecords';
 
 import PanelsGrid from '@/components/dashboard/PanelsGrid';
+import { getDashboardPageClassName } from '@/components/dashboard/layout/dashboardPageTemplate';
 
 const DashboardHome = () => {
   // Configurar timeout de sessão de 30 minutos
@@ -224,7 +225,7 @@ const DashboardHome = () => {
 
   return (
     <ModuleTemplateProvider>
-      <div className="space-y-6">
+      <div className={getDashboardPageClassName('standard')}>
         {/* Panels Grid - All active panels in module style */}
         <PanelsGrid activePanels={activePanels} />
 

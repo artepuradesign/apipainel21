@@ -25,7 +25,7 @@ $moduleBaseMap = [
     'financeiro' => '/controlepessoal-financeiro',
     'novocliente' => '/controlepessoal-novocliente',
     'relatorios' => '/controlepessoal-relatorios',
-    'vendasimples' => '/controlepessoal-vendasimples',
+    'vendasimples' => '/controlepessoal-cnpj-venda',
 ];
 
 $forcedModule = $forcedModule ?? null;

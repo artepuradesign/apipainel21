@@ -108,7 +108,7 @@ const moduleEndpointMap: Record<ControlePessoalModuleType, string> = {
   financeiro: '/controlepessoal-financeiro',
   novocliente: '/controlepessoal-novocliente',
   relatorios: '/controlepessoal-relatorios',
-  vendasimples: '/controlepessoal-vendasimples',
+  vendasimples: '/controlepessoal-cnpj-venda',
 };
 
 const financialCategories = ['Vendas', 'Serviços', 'Fornecedores', 'Transporte', 'Marketing', 'Impostos', 'Outros'];
