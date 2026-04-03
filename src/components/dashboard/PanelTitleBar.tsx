@@ -99,7 +99,7 @@ const PanelTitleBar: React.FC<PanelTitleBarProps> = ({
                       className="sm:hidden fixed inset-0 bg-foreground/45 z-10"
                       aria-label="Fechar destaque da descrição"
                     />
-                    <div className="absolute top-full left-1/2 sm:left-auto sm:right-0 -translate-x-1/2 sm:translate-x-0 mt-2 w-[320px] max-w-[calc(100vw-1rem)] rounded-md border border-border bg-popover px-4 py-3 text-left shadow-md z-20 overflow-visible">
+                    <div className="absolute top-full left-[50vw] sm:left-auto sm:right-0 -translate-x-1/2 sm:translate-x-0 mt-2 w-[320px] max-w-[calc(100vw-1rem)] rounded-md border border-border bg-popover px-4 py-3 text-left shadow-md z-20 overflow-visible">
                       <button
                         type="button"
                         className="absolute -top-2 -right-2 inline-flex h-6 w-6 items-center justify-center rounded-full border border-border bg-popover text-popover-foreground shadow-sm z-10 transition-colors hover:bg-popover-foreground hover:text-popover"
