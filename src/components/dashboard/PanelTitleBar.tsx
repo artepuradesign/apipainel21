@@ -28,6 +28,47 @@ const PanelTitleBar: React.FC<PanelTitleBarProps> = ({
 }) => {
   const [isHelpBalloonOpen, setIsHelpBalloonOpen] = React.useState(false);
   const [typedDescription, setTypedDescription] = React.useState('');
+  const [isMobileViewport, setIsMobileViewport] = React.useState(() => (typeof window !== 'undefined' ? window.innerWidth < 640 : false));
+  const [mobileBalloonTop, setMobileBalloonTop] = React.useState<number | undefined>(undefined);
+  const helpButtonRef = React.useRef<HTMLButtonElement | null>(null);
+
+  const updateMobileBalloonPosition = React.useCallback(() => {
+    if (typeof window === 'undefined') return;
+
+    const mobile = window.innerWidth < 640;
+    setIsMobileViewport(mobile);
+
+    if (!mobile || !helpButtonRef.current) return;
+
+    const rect = helpButtonRef.current.getBoundingClientRect();
+    setMobileBalloonTop(rect.bottom + 8);
+  }, []);
+
+  const openHelpBalloon = React.useCallback(() => {
+    updateMobileBalloonPosition();
+    setIsHelpBalloonOpen(true);
+  }, [updateMobileBalloonPosition]);
+
+  const toggleHelpBalloon = React.useCallback(() => {
+    if (isHelpBalloonOpen) {
+      setIsHelpBalloonOpen(false);
+      return;
+    }
+
+    updateMobileBalloonPosition();
+    setIsHelpBalloonOpen(true);
+  }, [isHelpBalloonOpen, updateMobileBalloonPosition]);
+
+  React.useEffect(() => {
+    updateMobileBalloonPosition();
+
+    const handleResize = () => {
+      updateMobileBalloonPosition();
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [updateMobileBalloonPosition]);
 
   React.useEffect(() => {
     if (!isHelpBalloonOpen || !description) {
@@ -80,14 +121,15 @@ const PanelTitleBar: React.FC<PanelTitleBarProps> = ({
                 className="relative"
               >
                 <Button
+                  ref={helpButtonRef}
                   type="button"
                   variant="outline"
                   size="icon"
                   className="rounded-full h-8 w-8 shrink-0"
                   aria-label={`Ajuda sobre ${title}`}
-                  onMouseEnter={() => setIsHelpBalloonOpen(true)}
-                  onFocus={() => setIsHelpBalloonOpen(true)}
-                  onClick={() => setIsHelpBalloonOpen((prev) => !prev)}
+                  onMouseEnter={openHelpBalloon}
+                  onFocus={openHelpBalloon}
+                  onClick={toggleHelpBalloon}
                 >
                   <CircleHelp className="h-3.5 w-3.5" />
                 </Button>
@@ -115,7 +157,10 @@ const PanelTitleBar: React.FC<PanelTitleBarProps> = ({
                 className="sm:hidden fixed inset-0 bg-foreground/45 z-10"
                 aria-label="Fechar destaque da descrição"
               />
-              <div className="absolute top-full left-1/2 sm:left-auto sm:right-0 -translate-x-1/2 sm:translate-x-0 mt-2 w-[320px] max-w-[calc(100vw-1rem)] rounded-md border border-border bg-popover px-4 py-3 text-left shadow-md z-20 overflow-visible">
+              <div
+                className="fixed sm:absolute top-0 sm:top-full left-1/2 sm:left-auto sm:right-0 -translate-x-1/2 sm:translate-x-0 mt-0 sm:mt-2 w-[320px] max-w-[calc(100vw-1rem)] rounded-md border border-border bg-popover px-4 py-3 text-left shadow-md z-20 overflow-visible"
+                style={isMobileViewport && mobileBalloonTop ? { top: mobileBalloonTop } : undefined}
+              >
                 <button
                   type="button"
                   className="absolute -top-2 -right-2 inline-flex h-6 w-6 items-center justify-center rounded-full border border-border bg-popover text-popover-foreground shadow-sm z-10 transition-colors hover:bg-popover-foreground hover:text-popover"
