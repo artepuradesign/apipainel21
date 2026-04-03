@@ -10,7 +10,7 @@ const ModuleGridWrapper = ({ children, className = '' }: ModuleGridWrapperProps)
     <div 
       className={[
         "grid w-full mx-auto justify-items-center",
-        "px-1 sm:px-2",
+        "px-0",
         "gap-x-1 gap-y-2.5",
         "[grid-template-columns:repeat(auto-fill,minmax(120px,1fr))]",
         "sm:[grid-template-columns:repeat(auto-fill,minmax(130px,1fr))]",
