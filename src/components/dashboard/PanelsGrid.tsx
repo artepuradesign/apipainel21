@@ -490,7 +490,7 @@ const PanelsGrid: React.FC<PanelsGridProps> = ({ activePanels }) => {
             <div className={`overflow-hidden transition-all duration-300 ease-out ${isCollapsed ? 'max-h-0 opacity-0 -translate-y-1 pointer-events-none mt-0' : 'max-h-[3000px] opacity-100 translate-y-0 mt-2 md:mt-3'}`}>
               <div className={`${glassClass} rounded-lg`} style={glassStyle}>
                 {panelModules.length > 0 ? (
-                  <ModuleGridWrapper className={isMobile ? 'px-3 pt-2 pb-2 [grid-template-columns:repeat(2,minmax(0,150px))] justify-between gap-x-2' : 'px-3 pt-2 pb-3 md:px-4 md:pt-2 md:pb-4 lg:[grid-template-columns:repeat(auto-fill,minmax(150px,150px))] lg:justify-between lg:justify-items-start'}>
+                  <ModuleGridWrapper className={isMobile ? 'px-0 pt-2 pb-2 [grid-template-columns:repeat(2,minmax(0,150px))] justify-between gap-x-2' : 'px-3 pt-2 pb-3 md:px-4 md:pt-2 md:pb-4 lg:[grid-template-columns:repeat(auto-fill,minmax(150px,150px))] lg:justify-between lg:justify-items-start'}>
                  {panelModules.map((module) => {
                    // Calcular preços - apenas com desconto se houver plano ativo da API
                    // Painel 38 não deve mostrar desconto
