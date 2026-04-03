@@ -7,8 +7,8 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
 import { Settings, Crown, Search, ArrowLeft } from 'lucide-react';
 import { toast } from 'sonner';
-import { Link } from 'react-router-dom';
-import PageHeaderCard from '@/components/dashboard/PageHeaderCard';
+import { Link, useNavigate } from 'react-router-dom';
+import SimpleTitleBar from '@/components/dashboard/SimpleTitleBar';
 import { useAuth } from '@/contexts/AuthContext';
 import { useWalletBalance } from '@/hooks/useWalletBalance';
 import { useUserSubscription } from '@/hooks/useUserSubscription';
@@ -51,6 +51,7 @@ const consultaOptions: ConsultaOption[] = [
 ];
 
 const ConsultarCpfCompleta = () => {
+  const navigate = useNavigate();
   const [cpf, setCpf] = useState('');
   const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
@@ -79,9 +80,11 @@ const ConsultarCpfCompleta = () => {
   if (planType !== 'rei') {
     return (
       <div className="space-y-6">
-        <PageHeaderCard 
-          title="Consulta Personalizada" 
+        <SimpleTitleBar
+          title="Consulta Personalizada"
           subtitle="Acesso negado - Disponível apenas para Planos Reis"
+          icon={<Crown className="h-5 w-5" />}
+          onBack={() => navigate('/dashboard')}
         />
         
         <Card className="dark:bg-gray-800 dark:border-gray-700">
@@ -240,9 +243,11 @@ const ConsultarCpfCompleta = () => {
 
   return (
     <div className="space-y-6">
-      <PageHeaderCard 
-        title="Consulta Personalizada" 
+      <SimpleTitleBar
+        title="Consulta Personalizada"
         subtitle="Selecione exatamente as informações que você precisa"
+        icon={<Settings className="h-5 w-5" />}
+        onBack={() => navigate('/dashboard')}
       />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
