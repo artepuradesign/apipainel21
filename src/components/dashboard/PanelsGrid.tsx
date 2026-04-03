@@ -451,7 +451,11 @@ const PanelsGrid: React.FC<PanelsGridProps> = ({ activePanels }) => {
       axis="y"
       values={orderedPanels}
       onReorder={setOrderedPanels}
-      className="space-y-2 md:space-y-3"
+      className={`space-y-2 md:space-y-3 ${
+        isManualReorderEnabled
+          ? 'rounded-lg border border-dashed border-border p-2 bg-muted/20 bg-[linear-gradient(to_right,hsl(var(--border)/0.35)_1px,transparent_1px),linear-gradient(to_bottom,hsl(var(--border)/0.35)_1px,transparent_1px)] bg-[size:18px_18px]'
+          : ''
+      }`}
     >
       {orderedPanels.map((panel) => {
         const PanelIcon = getIconComponent(panel.icon);
@@ -465,7 +469,7 @@ const PanelsGrid: React.FC<PanelsGridProps> = ({ activePanels }) => {
             key={panel.id}
             value={panel}
             drag={isManualReorderEnabled ? 'y' : false}
-            className={isManualReorderEnabled ? 'animate-fade-in' : ''}
+            className={isManualReorderEnabled ? 'animate-fade-in rounded-lg border border-dashed border-border/70 bg-background/90 p-1' : ''}
           >
             <PanelTitleBar
               title={panel.name}
