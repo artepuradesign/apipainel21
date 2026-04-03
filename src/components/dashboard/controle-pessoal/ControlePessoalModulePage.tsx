@@ -1241,29 +1241,25 @@ const ControlePessoalModulePage = ({ moduleType, title, subtitle, formTitle }: C
 
   return (
     <div className={modulePageSpacingClass}>
-      {isAgenda || isNewClient ? (
-        <SimpleTitleBar
-          title={title}
-          subtitle={subtitle}
-          icon={<Icon className="h-5 w-5" />}
-          leftActions={isAgenda ? (
-            <Button
-              type="button"
-              variant="outline"
-              size="icon"
-              onClick={isAgenda ? handleOpenAgendaModal : handleOpenNewClientLookupModal}
-              className="rounded-full h-8 w-8"
-              aria-label={isAgenda ? 'Novo compromisso' : 'Consultar CPF para novo cliente'}
-            >
-              <Plus className="h-4 w-4" />
-            </Button>
-          ) : undefined}
-          leftActionsTooltip={isAgenda ? 'Novo compromisso' : undefined}
-          onBack={() => navigate('/dashboard')}
-        />
-      ) : (
-        <PageHeaderCard title={title} subtitle={subtitle} />
-      )}
+      <SimpleTitleBar
+        title={title}
+        subtitle={subtitle}
+        icon={<Icon className="h-5 w-5" />}
+        leftActions={isAgenda ? (
+          <Button
+            type="button"
+            variant="outline"
+            size="icon"
+            onClick={isAgenda ? handleOpenAgendaModal : handleOpenNewClientLookupModal}
+            className="rounded-full h-8 w-8"
+            aria-label={isAgenda ? 'Novo compromisso' : 'Consultar CPF para novo cliente'}
+          >
+            <Plus className="h-4 w-4" />
+          </Button>
+        ) : undefined}
+        leftActionsTooltip={isAgenda ? 'Novo compromisso' : undefined}
+        onBack={() => navigate('/dashboard')}
+      />
 
       <div className={`grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_minmax(340px,420px)] ${isAgenda ? 'gap-2 md:gap-3' : 'gap-2 md:gap-3'}`}>
         {!isAgenda ? (
