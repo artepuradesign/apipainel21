@@ -28,6 +28,7 @@ import QRCode from 'react-qr-code';
 import { API_BASE_URL } from '@/config/apiConfig';
 import { formatMoneyBR } from '@/utils/formatters';
 import { getModulePrice } from '@/utils/modulePrice';
+import PanelTitleBar from '@/components/dashboard/PanelTitleBar';
 
 interface PanelsGridProps {
   activePanels: Panel[];
@@ -413,24 +414,20 @@ const PanelsGrid: React.FC<PanelsGridProps> = ({ activePanels }) => {
         
         return (
           <div key={panel.id} className={`${glassClass} rounded-lg`} style={glassStyle}>
-            <CardHeader className="pb-2 md:pb-3">
-              <div className="flex items-start justify-between gap-4">
-                <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-2 flex-wrap">
-                      <div className="p-2 bg-primary/10 rounded-lg">
-                      <PanelIcon className="h-8 w-8 text-purple-600 dark:text-purple-400" />
-                    </div>
-                    <CardTitle className={isMobile ? 'text-base' : ''}>{panel.name}</CardTitle>
-                    <div className="flex items-center justify-center w-8 h-8 bg-green-500 text-white rounded-full text-sm font-bold">
-                      {panelModules.length}
-                    </div>
+            <div className="px-2 pt-2 md:px-3 md:pt-3">
+              <PanelTitleBar
+                title={panel.name}
+                icon={<PanelIcon className="h-5 w-5 text-primary" />}
+                badge={
+                  <div className="inline-flex h-8 min-w-8 items-center justify-center rounded-full bg-success text-success-foreground px-2 text-sm font-bold">
+                    {panelModules.length}
                   </div>
-                </div>
-              </div>
-            </CardHeader>
+                }
+              />
+            </div>
             
             {panelModules.length > 0 ? (
-              <ModuleGridWrapper className={isMobile ? 'py-1 pb-2' : 'pt-0 pb-3 md:pt-0 md:pb-4'}>
+              <ModuleGridWrapper className={isMobile ? 'py-1 px-2 pb-2' : 'px-3 pt-2 pb-3 md:px-4 md:pt-2 md:pb-4'}>
                  {panelModules.map((module) => {
                    // Calcular preços - apenas com desconto se houver plano ativo da API
                    // Painel 38 não deve mostrar desconto
