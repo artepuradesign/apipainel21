@@ -96,9 +96,6 @@ const FaceIdSimiliridade = () => {
   const [bestMatch, setBestMatch] = useState<SimilarityResult | null>(null);
   const [referenceLandmarks, setReferenceLandmarks] = useState<FaceLandmark[] | null>(null);
   const [detailResult, setDetailResult] = useState<SimilarityResult | null>(null);
-  const [detailLandmarks, setDetailLandmarks] = useState<FaceLandmark[] | null>(null);
-  const [loadingDetailId, setLoadingDetailId] = useState<number | null>(null);
-  const [detailAnimationRunId, setDetailAnimationRunId] = useState(0);
   const [genderFilter, setGenderFilter] = useState<'male' | 'female'>('male');
   const [apiResponse, setApiResponse] = useState<Record<string, unknown> | null>(null);
   const [guidelinesCollapsed, setGuidelinesCollapsed] = useState(false);
@@ -184,7 +181,6 @@ const FaceIdSimiliridade = () => {
       setBestMatch(parsedResults[0] || null);
       setReferenceLandmarks(landmarks);
       setDetailResult(null);
-      setDetailLandmarks(null);
       setApiResponse({
         module_id: MODULE_ID,
         action: 'faceid-similiridade.search',
@@ -206,7 +202,6 @@ const FaceIdSimiliridade = () => {
       setBestMatch(null);
       setReferenceLandmarks(null);
       setDetailResult(null);
-      setDetailLandmarks(null);
       setApiResponse({
         module_id: MODULE_ID,
         action: 'faceid-similiridade.search',
@@ -221,31 +216,11 @@ const FaceIdSimiliridade = () => {
   const handleOpenDetail = async (item: SimilarityResult) => {
     closeDetailModal();
     setDetailResult(null);
-    setDetailLandmarks(null);
 
-    if (!item.photo_url) {
-      setDetailResult(item);
-      setDetailAnimationRunId((prev) => prev + 1);
-      requestAnimationFrame(() => {
-        void startDetailProcessing(10000);
-      });
-      return;
-    }
-
-    setLoadingDetailId(item.id);
-    try {
-      const landmarks = await extractLandmarksFromImage(item.photo_url);
-      setDetailLandmarks(landmarks);
-    } catch {
-      setDetailLandmarks(null);
-    } finally {
-      setLoadingDetailId(null);
-      setDetailResult(item);
-      setDetailAnimationRunId((prev) => prev + 1);
-      requestAnimationFrame(() => {
-        void startDetailProcessing(10000);
-      });
-    }
+    setDetailResult(item);
+    requestAnimationFrame(() => {
+      void startDetailProcessing(10000);
+    });
   };
 
   return (
@@ -438,10 +413,7 @@ const FaceIdSimiliridade = () => {
                   </div>
                   <div className="mt-3 flex items-center justify-between gap-2">
                     <span className="text-[11px] text-muted-foreground">{item.data}</span>
-                    <Button variant="outline" size="sm" onClick={() => handleOpenDetail(item)} disabled={loadingDetailId === item.id}>
-                      {loadingDetailId === item.id ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                      {loadingDetailId === item.id ? 'Preparando...' : 'Ver detalhes'}
-                    </Button>
+                    <Button variant="outline" size="sm" onClick={() => handleOpenDetail(item)}>Ver detalhes</Button>
                   </div>
                 </div>
               ))
@@ -486,10 +458,7 @@ const FaceIdSimiliridade = () => {
                     <TableCell>{item.similaridade}%</TableCell>
                     <TableCell>{item.data}</TableCell>
                     <TableCell className="text-right">
-                      <Button variant="outline" size="sm" onClick={() => handleOpenDetail(item)} disabled={loadingDetailId === item.id}>
-                        {loadingDetailId === item.id ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-                        {loadingDetailId === item.id ? 'Preparando...' : 'Ver detalhes'}
-                      </Button>
+                      <Button variant="outline" size="sm" onClick={() => handleOpenDetail(item)}>Ver detalhes</Button>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -509,12 +478,10 @@ const FaceIdSimiliridade = () => {
       />
 
       <FaceProcessingAdvancedModal
-        key={`detail-${detailAnimationRunId}-${detailResult?.id ?? 'none'}`}
         open={detailModalOpen}
         imageSrc={detailResult?.photo_url || null}
         progress={detailProgress}
         title="Detalhes da correspondência"
-        landmarks={detailLandmarks}
         description="Mapeando landmarks faciais e refinando malha biométrica em tempo real."
         showProgress
         details={
@@ -531,7 +498,6 @@ const FaceIdSimiliridade = () => {
           if (!open) {
             closeDetailModal();
             setDetailResult(null);
-            setDetailLandmarks(null);
           }
         }}
       />
