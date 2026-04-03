@@ -40,6 +40,7 @@ const loadMediaPipe = async () => {
 
 const extractLandmarksFromImage = async (imageSrc: string): Promise<FaceLandmark[]> => {
   const img = new Image();
+  img.crossOrigin = 'anonymous';
   img.src = imageSrc;
   await new Promise<void>((resolve, reject) => {
     img.onload = () => resolve();

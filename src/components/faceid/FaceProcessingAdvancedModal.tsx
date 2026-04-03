@@ -177,6 +177,7 @@ const FaceProcessingAdvancedModal = ({
       }
 
       const img = new Image();
+      img.crossOrigin = 'anonymous';
       img.src = imageSrc;
       await new Promise((resolve) => {
         img.onload = resolve;
