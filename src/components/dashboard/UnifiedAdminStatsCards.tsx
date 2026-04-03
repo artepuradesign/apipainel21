@@ -118,9 +118,9 @@ const UnifiedAdminStatsCards: React.FC<UnifiedAdminStatsCardsProps> = ({ dashboa
   };
   if (!dashboardStats) {
     return (
-      <div className="space-y-4">
+      <div className="space-y-2 md:space-y-3">
         {/* Linha 1 - Financeiro Principal */}
-        <div className="grid grid-cols-2 gap-3 lg:gap-4">
+        <div className="grid grid-cols-2 gap-2 md:gap-3">
            {[...Array(2)].map((_, i) => (
             <Card key={i} className="animate-pulse">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -138,7 +138,7 @@ const UnifiedAdminStatsCards: React.FC<UnifiedAdminStatsCardsProps> = ({ dashboa
         </div>
         
         {/* Linha 2 - Métodos de Pagamento */}
-        <div className="grid grid-cols-2 gap-3 lg:gap-4">
+        <div className="grid grid-cols-2 gap-2 md:gap-3">
            {[...Array(2)].map((_, i) => (
             <Card key={i + 4} className="animate-pulse">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -156,7 +156,7 @@ const UnifiedAdminStatsCards: React.FC<UnifiedAdminStatsCardsProps> = ({ dashboa
         </div>
         
         {/* Linha 3 - Sistema e Usuários */}
-        <div className="grid grid-cols-2 gap-3 lg:gap-4">
+        <div className="grid grid-cols-2 gap-2 md:gap-3">
           {[...Array(2)].map((_, i) => (
             <Card key={i + 8} className="animate-pulse">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -433,21 +433,21 @@ const UnifiedAdminStatsCards: React.FC<UnifiedAdminStatsCardsProps> = ({ dashboa
   ];
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-2 md:space-y-3">
       {/* Linha 0 - Pedidos */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 md:gap-3">
         {pedidosData.map((stat, i) => renderCard(stat, i + 100))}
       </div>
       {/* Linha 1 - Financeiro */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 md:gap-3">
         {financialData.map((stat, i) => renderCard(stat, i))}
       </div>
       {/* Linha 2 - Pagamentos */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 md:gap-3">
         {paymentData.map((stat, i) => renderCard(stat, i + 4))}
       </div>
       {/* Linha 3 - Sistema */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 md:gap-3">
         {systemData.map((stat, i) => renderCard(stat, i + 8))}
       </div>
     </div>
