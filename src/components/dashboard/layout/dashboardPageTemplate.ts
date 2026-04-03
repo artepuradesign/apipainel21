@@ -13,7 +13,7 @@ const dashboardHeaderGapByVariant: Record<DashboardSpacingVariant, string> = {
 const dashboardTitleWrapperClassName = '-mb-2 md:-mb-2';
 
 export const getDashboardPageClassName = (variant: DashboardSpacingVariant = 'standard') =>
-  `${dashboardSpacingByVariant[variant]} relative z-10 px-1 sm:px-0`;
+  `${dashboardSpacingByVariant[variant]} relative z-10`;
 
 export const getDashboardHeaderContentGapClassName = (variant: DashboardSpacingVariant = 'standard') =>
   dashboardHeaderGapByVariant[variant];
