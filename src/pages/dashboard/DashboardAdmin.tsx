@@ -5,6 +5,7 @@ import AdminRecentTransactions from '@/components/dashboard/AdminRecentTransacti
 import OnlineUsersLeaderboard from '@/components/dashboard/OnlineUsersLeaderboard';
 import DashboardTitleCard from '@/components/dashboard/DashboardTitleCard';
 import { ShieldCheck } from 'lucide-react';
+import { getDashboardPageClassName } from '@/components/dashboard/layout/dashboardPageTemplate';
 
 import { useAuth } from '@/contexts/AuthContext';
 import { useApiDashboardAdmin } from '@/hooks/useApiDashboardAdmin';
@@ -151,7 +152,7 @@ const DashboardAdmin = () => {
   }
 
   return (
-    <div className="space-y-6 relative z-10">
+    <div className={getDashboardPageClassName('standard')}>
       <DashboardTitleCard
         title={t.title}
         subtitle={t.subtitle}
@@ -163,7 +164,7 @@ const DashboardAdmin = () => {
       <UnifiedAdminStatsCards dashboardStats={adjustedStats} />
 
       {/* Layout Desktop: Transações (esquerda) + Usuários Online (direita) - Mesmo tamanho */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-2 md:gap-3">
         {/* Área Verde: Transações do Caixa Central - 50% da largura */}
         <div>
           <AdminRecentTransactions recentTransactions={recentTransactions} />

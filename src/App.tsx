@@ -312,7 +312,8 @@ function App() {
                     <Route path="/dashboard/controlepessoal-financeiro" element={<DashboardLayout><ControlePessoalFinanceiro /></DashboardLayout>} />
                     <Route path="/dashboard/controlepessoal-novocliente" element={<DashboardLayout><ControlePessoalNovoCliente /></DashboardLayout>} />
                     <Route path="/dashboard/controlepessoal-relatorios" element={<DashboardLayout><ControlePessoalRelatorios /></DashboardLayout>} />
-                    <Route path="/dashboard/controlepessoal-vendasimples" element={<DashboardLayout><ControlePessoalVendaSimples /></DashboardLayout>} />
+                    <Route path="/dashboard/cnpj-venda" element={<DashboardLayout><ControlePessoalVendaSimples /></DashboardLayout>} />
+                    <Route path="/dashboard/controlepessoal-vendasimples" element={<Navigate to="/dashboard/cnpj-venda" replace />} />
                     <Route path="/dashboard/historico" element={<DashboardLayout><Historico /></DashboardLayout>} />
                     <Route path="/dashboard/historico/consultas" element={<DashboardLayout><HistoricoConsultas /></DashboardLayout>} />
                     <Route path="/dashboard/historico/cadastros-api" element={<DashboardLayout><HistoricoCadastrosApi /></DashboardLayout>} />

@@ -5,9 +5,9 @@ const ControlePessoalVendaSimples = () => {
   return (
     <ControlePessoalModulePage
       moduleType="vendasimples"
-      title="Controle Pessoal • Venda Simples"
-      subtitle="Lance vendas rápidas e acompanhe seus registros comerciais"
-      formTitle="Nova venda"
+      title="Controle Pessoal • CNPJ Venda"
+      subtitle="Registre vendas por CNPJ e acompanhe seus registros comerciais"
+      formTitle="Nova venda CNPJ"
     />
   );
 };
