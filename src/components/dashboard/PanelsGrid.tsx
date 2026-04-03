@@ -528,7 +528,6 @@ const PanelsGrid: React.FC<PanelsGridProps> = ({ activePanels }) => {
                 )}
                 </div>
               </div>
-            </div>
           </div>
         );
       })}
