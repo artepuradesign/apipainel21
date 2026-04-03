@@ -512,6 +512,7 @@ const FaceIdSimiliridade = () => {
         progress={detailProgress}
         title="Detalhes da correspondência"
         landmarks={detailLandmarks}
+        enablePostScan3D
         description="Mapeando landmarks faciais e refinando malha biométrica em tempo real."
         showProgress
         details={
