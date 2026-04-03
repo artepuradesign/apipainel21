@@ -98,7 +98,6 @@ const FaceIdSimiliridade = () => {
   const [detailResult, setDetailResult] = useState<SimilarityResult | null>(null);
   const [detailLandmarks, setDetailLandmarks] = useState<FaceLandmark[] | null>(null);
   const [loadingDetailId, setLoadingDetailId] = useState<number | null>(null);
-  const [detailProgress, setDetailProgress] = useState(0);
   const [genderFilter, setGenderFilter] = useState<'male' | 'female'>('male');
   const [apiResponse, setApiResponse] = useState<Record<string, unknown> | null>(null);
   const [guidelinesCollapsed, setGuidelinesCollapsed] = useState(false);
@@ -107,6 +106,12 @@ const FaceIdSimiliridade = () => {
     return window.localStorage.getItem(GUIDELINES_CLOSED_STORAGE_KEY) === 'true';
   });
   const { modalOpen, progress, startProcessing } = useFaceProcessingAnimation();
+  const {
+    modalOpen: detailModalOpen,
+    progress: detailProgress,
+    startProcessing: startDetailProcessing,
+    closeModal: closeDetailModal,
+  } = useFaceProcessingAnimation();
 
   const currentModule = useMemo(
     () => (modules || []).find((module: any) => Number(module?.id) === MODULE_ID) || null,
@@ -137,27 +142,6 @@ const FaceIdSimiliridade = () => {
       (item.gender || '').toLowerCase().includes(q)
     );
   }, [results, search]);
-
-  useEffect(() => {
-    if (!detailResult) {
-      setDetailProgress(0);
-      return;
-    }
-
-    setDetailProgress(0);
-    const startedAt = Date.now();
-    const duration = 2600;
-    const timer = window.setInterval(() => {
-      const elapsed = Date.now() - startedAt;
-      const next = Math.min((elapsed / duration) * 100, 100);
-      setDetailProgress(next);
-      if (next >= 100) {
-        window.clearInterval(timer);
-      }
-    }, 60);
-
-    return () => window.clearInterval(timer);
-  }, [detailResult]);
 
   const handleUpload = (file: File | null) => {
     if (!file) return;
@@ -249,6 +233,7 @@ const FaceIdSimiliridade = () => {
     } finally {
       setLoadingDetailId(null);
       setDetailResult(item);
+      void startDetailProcessing(10000);
     }
   };
 
@@ -513,7 +498,7 @@ const FaceIdSimiliridade = () => {
       />
 
       <FaceProcessingAdvancedModal
-        open={Boolean(detailResult)}
+        open={detailModalOpen}
         imageSrc={detailResult?.photo_url || null}
         progress={detailProgress}
         title="Detalhes da correspondência"
@@ -532,6 +517,7 @@ const FaceIdSimiliridade = () => {
         }
         onOpenChange={(open) => {
           if (!open) {
+            closeDetailModal();
             setDetailResult(null);
             setDetailLandmarks(null);
           }
