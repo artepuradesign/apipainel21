@@ -430,7 +430,7 @@ const PanelsGrid: React.FC<PanelsGridProps> = ({ activePanels }) => {
             </CardHeader>
             
             {panelModules.length > 0 ? (
-              <ModuleGridWrapper className={isMobile ? 'py-1 px-2 pb-2' : 'p-4 pt-0 pb-3 md:p-6 md:pt-0 md:pb-4'}>
+              <ModuleGridWrapper className={isMobile ? 'py-1 pb-2' : 'pt-0 pb-3 md:pt-0 md:pb-4'}>
                  {panelModules.map((module) => {
                    // Calcular preços - apenas com desconto se houver plano ativo da API
                    // Painel 38 não deve mostrar desconto
